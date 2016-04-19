@@ -5,7 +5,9 @@
                 import ddf.minim.analysis.*;
                 import ddf.minim.ugens.*;
                 import ddf.minim.effects.*;
-                
+                import oscP5.*;
+                import netP5.*;
+
                 Minim minim;
                 AudioPlayer song;
                 float signo=0;
@@ -22,8 +24,9 @@
                 int target_arriba, target_abajo;
                 PVector posicion_gui;
                 PImage sombra;
-//Variables del visualizador
-                
+//Variables OSC
+                OscP5 oscP5;
+                NetAddress dest;
      
                 
 
@@ -34,7 +37,7 @@ void setup() {
                                   frameRate(60);
                                   
                                   //setup gui
-                                  posicion_gui=new PVector (width-260, height-52);
+                                  posicion_gui=new PVector (width-260, height);
                                   gui=new Gui(posicion_gui, 350, 250);
                                   listacanciones=new  ArrayList<String>();
                                   listatitulos=new  ArrayList<String>();
@@ -46,9 +49,9 @@ void setup() {
                                   song = minim.loadFile("dummy_01.mp3");
                                   
                                   //
-                                  //setup visualizer
-                            
-                                  
+                                  //setup OSC
+                                  oscP5 = new OscP5(this,12000); //escuchando en 12000
+                                   dest = new NetAddress("127.0.0.1",6448); //enviando a 6448
                                   
                                   
                                   
@@ -75,6 +78,7 @@ void draw() {
                                 signo=1;
                               }
                               flujo=song.mix.level()*(Factor*signo);
+                              sendOsc(flujo);
 // Aqui esta el visualizador
 
 //fin visualizador
@@ -101,7 +105,12 @@ void draw() {
                          gui.display();
 }//fin draw
 
-
+void sendOsc(float valor) {
+  OscMessage msg = new OscMessage("/intensidad");
+  msg.add((float)valor); 
+ 
+  oscP5.send(msg, dest);
+}
 
 
 
