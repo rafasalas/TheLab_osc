@@ -53,7 +53,7 @@ class Gui{
                               fill(255,255,255,20);
                                rect(0,15, Ancho, height);
                               //image(logo,0,500);
-                                      shape(logo,0,650,240,90);
+                                      shape(logo,0,300,240,90);
                                       boton.display();
                                       barra.display(donde);
                                       lista.display();

@@ -13,6 +13,7 @@
                 float signo=0;
                 float Factor=50;
                 float flujo=0;
+                float[] fft_value;
 
 //Variables de GUI
                 int vis_height, vis_width;
@@ -21,28 +22,28 @@
                 public int superpuntero=-1, cancionatrapada=-1;
                 String[] lines, canciones;
                 Gui gui;
-                int target_arriba, target_abajo;
+                //int target_arriba, target_abajo;
                 PVector posicion_gui;
                 PImage sombra;
 //Variables OSC
-                OscP5 oscP5;
-                NetAddress dest;
+                OscP5 oscP5_1, oscP5_2;
+                NetAddress dest, dest2;
      
                 
 
 
 void setup() {
-                                  size(500, 700, P2D);
+                                  size(260, 500, P2D);
                                   smooth(8);
                                   frameRate(60);
                                   
                                   //setup gui
-                                  posicion_gui=new PVector (width-260, height);
+                                  posicion_gui=new PVector (0, 0);
                                   gui=new Gui(posicion_gui, 350, 250);
                                   listacanciones=new  ArrayList<String>();
                                   listatitulos=new  ArrayList<String>();
-                                  target_arriba=10;
-                                  target_abajo=height-52;
+                                  //target_arriba=0;
+                                  //target_abajo=height-52;
                                   sombra = loadImage("sombra.png");
                                   //setup minim
                                   minim = new Minim(this);
@@ -50,11 +51,13 @@ void setup() {
                                   
                                   //
                                   //setup OSC
-                                  oscP5 = new OscP5(this,12000); //escuchando en 12000
+                                 // oscP5_1 = new OscP5(this,12000); //escuchando en 12000
+                                  oscP5_2= new OscP5(this,12000); //escuchando en 12000
                                    dest = new NetAddress("127.0.0.1",6448); //enviando a 6448
+                                   dest2 = new NetAddress("127.0.0.1",6449); 
+                                  //dest = new NetAddress("192.168.0.104",6448); //enviando a 6448
                                   
-                                  
-                                  
+                                  fft_value=new float[song.bufferSize ()] ;
                                   
 }//fin setup
 
@@ -71,6 +74,7 @@ void draw() {
                               for (int i = 0; i < song.bufferSize () - 1; i++)
                               {
                                 signo=signo+song.mix.get(i);
+                                fft_value[i]=song.mix.get(i);
                               }
                               if (signo>0) {
                                 signo=signo/-signo;
@@ -78,7 +82,9 @@ void draw() {
                                 signo=1;
                               }
                               flujo=song.mix.level()*(Factor*signo);
-                              sendOsc(flujo);
+                             // sendOsc_int(flujo,dest);
+                              sendOsc_fft(fft_value,dest2);
+                              
 // Aqui esta el visualizador
 
 //fin visualizador
@@ -96,22 +102,32 @@ void draw() {
                           inicianuevacancion();
                               }
 
-                          if (esta_arriba && target_arriba!=gui.Posiciongui.y) {
-                            gui.Posiciongui.y=target_arriba;
-                          }
-                          if (!esta_arriba && target_abajo!=gui.Posiciongui.y) {
-                            gui.Posiciongui.y=target_abajo;
-                          }
+                         // if (esta_arriba && target_arriba!=gui.Posiciongui.y) {
+                          //  gui.Posiciongui.y=target_arriba;
+                         // }
+                         // if (!esta_arriba && target_abajo!=gui.Posiciongui.y) {
+                          //  gui.Posiciongui.y=target_abajo;
+                          //}
                          gui.display();
 }//fin draw
 
-void sendOsc(float valor) {
-  OscMessage msg = new OscMessage("/intensidad");
-  msg.add((float)valor); 
- 
-  oscP5.send(msg, dest);
-}
+void sendOsc_int(float valor,NetAddress dest) {
 
+ OscMessage msg = new OscMessage("/intensidad");
+ msg.add((float)valor); 
+ 
+//  oscP5_1.send(msg, dest);
+ 
+}
+void sendOsc_fft(float[] fft_value, NetAddress dest) {
+
+ OscMessage msg = new OscMessage("/fft_value");
+    for (int i = 0; i <fft_value.length - 1; i++)
+       {msg.add((float)fft_value[i]);} 
+ 
+  oscP5_2.send(msg, dest);
+ 
+}
 
 
 
