@@ -115,18 +115,15 @@ void sendOsc_int(float valor,NetAddress dest) {
 
  OscMessage msg = new OscMessage("/intensidad");
  msg.add((float)valor); 
- oscP5_1.send(msg, dest);
+ 
  
 }
 void sendOsc_fft(float[] fft_value, NetAddress dest) {
 
  OscMessage msg = new OscMessage("/fft_value");
- for (int i = 510; i <1020; i++)
     //for (int i = 0; i <fft_value.length - 1; i++)
-       {msg.add((float)fft_value[i]);} 
-       //msg.add(12);
-      // msg.add((float)fft_value[0]);
-       // msg.add((float)fft_value[2]);
+       //{msg.add((float)fft_value[i]);} 
+       msg.add(12);
   oscP5_2.send(msg, dest);
  
 }

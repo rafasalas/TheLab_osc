@@ -13,7 +13,6 @@
                 float signo=0;
                 float Factor=50;
                 float flujo=0;
-                float[] fft_value;
 
 //Variables de GUI
                 int vis_height, vis_width;
@@ -26,8 +25,8 @@
                 PVector posicion_gui;
                 PImage sombra;
 //Variables OSC
-                OscP5 oscP5_1, oscP5_2;
-                NetAddress dest, dest2;
+                OscP5 oscP5;
+                NetAddress dest;
      
                 
 
@@ -51,13 +50,11 @@ void setup() {
                                   
                                   //
                                   //setup OSC
-                                  oscP5_1 = new OscP5(this,12000); //escuchando en 12000
-                                  oscP5_2= new OscP5(this,12001); //escuchando en 12001
+                                  oscP5 = new OscP5(this,12000); //escuchando en 12000
                                    dest = new NetAddress("127.0.0.1",6448); //enviando a 6448
-                                   dest2 = new NetAddress("127.0.0.1",6449); 
-                                  //dest = new NetAddress("192.168.0.104",6448); //enviando a 6448
                                   
-                                  fft_value=new float[song.bufferSize ()] ;
+                                  
+                                  
                                   
 }//fin setup
 
@@ -74,7 +71,6 @@ void draw() {
                               for (int i = 0; i < song.bufferSize () - 1; i++)
                               {
                                 signo=signo+song.mix.get(i);
-                                fft_value[i]=song.mix.get(i);
                               }
                               if (signo>0) {
                                 signo=signo/-signo;
@@ -82,9 +78,7 @@ void draw() {
                                 signo=1;
                               }
                               flujo=song.mix.level()*(Factor*signo);
-                              sendOsc_int(flujo,dest);
-                              sendOsc_fft(fft_value,dest2);
-                              
+                              sendOsc(flujo);
 // Aqui esta el visualizador
 
 //fin visualizador
@@ -111,25 +105,13 @@ void draw() {
                          gui.display();
 }//fin draw
 
-void sendOsc_int(float valor,NetAddress dest) {
-
- OscMessage msg = new OscMessage("/intensidad");
- msg.add((float)valor); 
- oscP5_1.send(msg, dest);
+void sendOsc(float valor) {
+  OscMessage msg = new OscMessage("/intensidad");
+  msg.add((float)valor); 
  
+  oscP5.send(msg, dest);
 }
-void sendOsc_fft(float[] fft_value, NetAddress dest) {
 
- OscMessage msg = new OscMessage("/fft_value");
- for (int i = 510; i <1020; i++)
-    //for (int i = 0; i <fft_value.length - 1; i++)
-       {msg.add((float)fft_value[i]);} 
-       //msg.add(12);
-      // msg.add((float)fft_value[0]);
-       // msg.add((float)fft_value[2]);
-  oscP5_2.send(msg, dest);
- 
-}
 
 
 
