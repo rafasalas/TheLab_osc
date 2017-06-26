@@ -51,8 +51,8 @@ void setup() {
                                   
                                   //
                                   //setup OSC
-                                 // oscP5_1 = new OscP5(this,12000); //escuchando en 12000
-                                  oscP5_2= new OscP5(this,12000); //escuchando en 12000
+                                  oscP5_1 = new OscP5(this,12000); //escuchando en 12000
+                                  oscP5_2= new OscP5(this,12001); //escuchando en 12001
                                    dest = new NetAddress("127.0.0.1",6448); //enviando a 6448
                                    dest2 = new NetAddress("127.0.0.1",6449); 
                                   //dest = new NetAddress("192.168.0.104",6448); //enviando a 6448
@@ -82,7 +82,7 @@ void draw() {
                                 signo=1;
                               }
                               flujo=song.mix.level()*(Factor*signo);
-                             // sendOsc_int(flujo,dest);
+                              sendOsc_int(flujo,dest);
                               sendOsc_fft(fft_value,dest2);
                               
 // Aqui esta el visualizador
@@ -116,15 +116,14 @@ void sendOsc_int(float valor,NetAddress dest) {
  OscMessage msg = new OscMessage("/intensidad");
  msg.add((float)valor); 
  
-//  oscP5_1.send(msg, dest);
  
 }
 void sendOsc_fft(float[] fft_value, NetAddress dest) {
 
  OscMessage msg = new OscMessage("/fft_value");
-    for (int i = 0; i <fft_value.length - 1; i++)
-       {msg.add((float)fft_value[i]);} 
- 
+    //for (int i = 0; i <fft_value.length - 1; i++)
+       //{msg.add((float)fft_value[i]);} 
+       msg.add(12);
   oscP5_2.send(msg, dest);
  
 }
