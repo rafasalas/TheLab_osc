@@ -121,7 +121,7 @@ void sendOsc_int(float valor,NetAddress dest) {
 void sendOsc_fft(float[] fft_value, NetAddress dest) {
 
  OscMessage msg = new OscMessage("/fft_value");
- for (int i = 510; i <1020; i++)
+ for (int i = 0; i <512; i++)
     //for (int i = 0; i <fft_value.length - 1; i++)
        {msg.add((float)fft_value[i]);} 
        //msg.add(12);
