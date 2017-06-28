@@ -14,6 +14,8 @@
                 float Factor=50;
                 float flujo=0;
                 float[] fft_value;
+                int bufferSize=512;
+                FFT fft;
 
 //Variables de GUI
                 int vis_height, vis_width;
@@ -47,8 +49,8 @@ void setup() {
                                   sombra = loadImage("sombra.png");
                                   //setup minim
                                   minim = new Minim(this);
-                                  song = minim.loadFile("dummy_01.mp3");
-                                  
+                                  song = minim.loadFile("dummy_01.mp3",bufferSize);
+                                  fft = new FFT( song.bufferSize(), song.sampleRate() );
                                   //
                                   //setup OSC
                                   oscP5_1 = new OscP5(this,12000); //escuchando en 12000
@@ -69,12 +71,12 @@ void draw() {
   //background(206,40,40);
   image(sombra, 0, 0,width,height);
   //lee valores de musica 
-  
+                              fft.forward( song.mix );
 
                               for (int i = 0; i < song.bufferSize () - 1; i++)
                               {
                                 signo=signo+song.mix.get(i);
-                                fft_value[i]=song.mix.get(i);
+                                fft_value[i]=fft.getBand(i);
                               }
                               if (signo>0) {
                                 signo=signo/-signo;
@@ -82,6 +84,7 @@ void draw() {
                                 signo=1;
                               }
                               flujo=song.mix.level()*(Factor*signo);
+                              //Sending
                               sendOsc_int(flujo,dest);
                               sendOsc_fft(fft_value,dest2);
                               
@@ -121,12 +124,10 @@ void sendOsc_int(float valor,NetAddress dest) {
 void sendOsc_fft(float[] fft_value, NetAddress dest) {
 
  OscMessage msg = new OscMessage("/fft_value");
- for (int i = 0; i <512; i++)
-    //for (int i = 0; i <fft_value.length - 1; i++)
+ 
+    for (int i = 0; i <fft_value.length - 1; i++)
        {msg.add((float)fft_value[i]);} 
-       //msg.add(12);
-      // msg.add((float)fft_value[0]);
-       // msg.add((float)fft_value[2]);
+       
   oscP5_2.send(msg, dest);
  
 }
@@ -167,7 +168,7 @@ void inicianuevacancion() {
   gui.lista.index_activo=superpuntero;
   gui.boton.isPlay=false;
   try { 
-    song = minim.loadFile(listacanciones.get(superpuntero));
+    song = minim.loadFile(listacanciones.get(superpuntero),bufferSize);
     song.play();
     gui.boton.isPlay=true;
   } 
@@ -271,7 +272,7 @@ void mouseReleased() {
     if (gui.lista.index_activo!=superpuntero) {
       try {
         minim.stop();
-        song = minim.loadFile(listacanciones.get(gui.lista.index_activo));
+        song = minim.loadFile(listacanciones.get(gui.lista.index_activo),bufferSize);
         superpuntero=gui.lista.index_activo;
       } 
       catch(Exception e) {
