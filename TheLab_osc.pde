@@ -55,8 +55,11 @@ void setup() {
                                   //setup OSC
                                   oscP5_1 = new OscP5(this,12000); //escuchando en 12000
                                   oscP5_2= new OscP5(this,12001); //escuchando en 12001
-                                   dest = new NetAddress("127.0.0.1",6448); //enviando a 6448
-                                   dest2 = new NetAddress("127.0.0.1",6449); 
+                                   //dest = new NetAddress("127.0.0.1",6448); //enviando a 6448
+                                   
+                                  // dest2 = new NetAddress("127.0.0.1",6449); 
+                                    dest = new NetAddress("255.255.255.255",6448);
+                                     dest2 = new NetAddress("255.255.255.255",6449);
                                   //dest = new NetAddress("192.168.0.104",6448); //enviando a 6448
                                   
                                   fft_value=new float[song.bufferSize ()] ;
